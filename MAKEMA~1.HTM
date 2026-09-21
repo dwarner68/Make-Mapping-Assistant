@@ -1,0 +1,1483 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@600;700&family=Source+Sans+Pro:wght@400;600;700&display=swap');
+:root{
+  --navy:#002B49; --navy2:#01192e; --orange:#FF6A39; --lightblue:#5BC2E7;
+  --slate:#7A99AC; --white:#FFFFFF; --ink:#1D1F2A; --muted:#9FB4C6;
+  --card:#0B2C48; --border:rgba(255,255,255,0.10); --radius:12px; --success:#22C55E; --gold:#F1BE48;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans Pro',Arial,sans-serif;background:var(--navy);color:var(--white);min-height:100vh;display:flex;flex-direction:column;}
+header{background:linear-gradient(135deg,#002B49 0%,#01436e 100%);border-bottom:2px solid var(--orange);padding:22px 36px;display:flex;align-items:center;gap:16px;}
+.logo{width:46px;height:46px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--orange),var(--gold));display:flex;align-items:center;justify-content:center;font-size:22px;}
+header h1{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:-.2px;}
+header p{font-size:.78rem;color:var(--muted);margin-top:2px;}
+
+main{flex:1;max-width:1100px;width:100%;margin:0 auto;padding:40px 22px 60px;display:flex;flex-direction:column;gap:24px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;}
+.step{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.step-n{width:28px;height:28px;border-radius:50%;background:var(--orange);color:#fff;font-weight:700;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-label{font-family:'Barlow Condensed',sans-serif;font-size:1.15rem;font-weight:700;}
+
+#drop-zone{border:2px dashed rgba(255,255,255,.22);border-radius:var(--radius);padding:52px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
+#drop-zone:hover,#drop-zone.over{border-color:var(--orange);background:rgba(255,106,57,.08);}
+#drop-zone input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;}
+.dz-icon{font-size:3rem;margin-bottom:12px;}
+.dz-title{font-size:1.05rem;font-weight:700;margin-bottom:6px;}
+.dz-sub{font-size:.8rem;color:var(--muted);}
+.fmt-pill{display:inline-block;margin-top:14px;padding:4px 12px;border-radius:99px;font-size:.65rem;font-weight:700;letter-spacing:.8px;font-family:'DM Mono',monospace;background:rgba(91,194,231,.15);color:#9FE0FF;border:1px solid rgba(91,194,231,.3);}
+
+.file-chip{display:flex;align-items:center;gap:12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:12px 16px;margin-top:10px;}
+.file-chip.pending{background:rgba(255,255,255,.05);border-color:var(--border);}
+.file-chip.error{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.3);}
+.fc-icon{font-size:1.4rem;}
+.fc-info{flex:1;min-width:0;}
+.fc-name{font-size:.85rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.fc-sub{font-size:.72rem;color:var(--muted);}
+.fc-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:4px 8px;flex-shrink:0;}
+.fc-remove:hover{color:#FCA5A5;}
+
+#status-line{margin-top:14px;font-size:.82rem;color:var(--muted);min-height:1.2em;}
+#status-line.err{color:#FCA5A5;}
+
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px 22px;font-size:.88rem;font-weight:700;cursor:pointer;transition:transform .12s, filter .12s;font-family:'Source Sans Pro',sans-serif;}
+.btn:hover{filter:brightness(1.08);}
+.btn:active{transform:scale(.98);}
+.btn-secondary{background:transparent;border:1px solid var(--border);color:var(--white);}
+
+.stats-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+.stat-box{flex:1;min-width:130px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.stat-num{font-family:'Barlow Condensed',sans-serif;font-size:1.9rem;font-weight:700;color:var(--lightblue);}
+.stat-lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+
+.controls-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;align-items:center;}
+.controls-row select, .controls-row input[type=text]{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--white);border-radius:8px;padding:9px 12px;font-size:.82rem;font-family:'Source Sans Pro',sans-serif;}
+.controls-row input[type=text]{flex:1;min-width:180px;}
+
+table{width:100%;border-collapse:collapse;font-size:.78rem;}
+thead th{text-align:left;padding:8px 10px;color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);}
+tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top;}
+tbody tr:hover{background:rgba(255,255,255,.03);}
+.tbl-wrap{max-height:520px;overflow:auto;border:1px solid var(--border);border-radius:10px;}
+.new-make-input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--white);border-radius:6px;padding:6px 9px;font-size:.8rem;font-family:'DM Mono',monospace;text-transform:uppercase;}
+.new-make-input:focus{outline:none;border-color:var(--orange);}
+.guess-hint{font-size:.66rem;color:var(--muted);margin-top:3px;}
+tr.row-flagged{background:rgba(241,190,72,.05);}
+tr.row-flagged:hover{background:rgba(241,190,72,.1);}
+.review-flag{margin-right:6px;}
+.status-badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.65rem;font-weight:700;white-space:nowrap;}
+.st-exact{background:rgba(34,197,94,.15);color:#4ADE80;border:1px solid rgba(34,197,94,.3);}
+.st-fuzzy{background:rgba(241,190,72,.15);color:var(--gold);border:1px solid rgba(241,190,72,.3);}
+.st-generic{background:rgba(122,153,172,.15);color:var(--slate);border:1px solid rgba(122,153,172,.3);}
+.st-review{background:rgba(220,38,38,.12);color:#FCA5A5;border:1px solid rgba(220,38,38,.3);}
+
+.note{font-size:.78rem;color:var(--muted);line-height:1.6;margin-top:14px;}
+.note strong{color:var(--white);}
+
+footer{text-align:center;padding:20px;font-size:.72rem;color:var(--muted);}
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:6px;}
+</style>
+
+<header>
+  <div class="logo">🔀</div>
+  <div>
+    <h1>Make Mapping Assistant</h1>
+    <p>Standardizes messy customer-entered make names against a canonical Marine / RV / Trailer / Golf / Powersports manufacturer list</p>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="step"><div class="step-n">1</div><div class="step-label">Drop in one or more make-mapping CSVs</div></div>
+    <div id="drop-zone">
+      <input type="file" id="file-input" accept=".csv,text/csv" multiple />
+      <div class="dz-icon">📋</div>
+      <div class="dz-title">Drag &amp; drop CSVs with Source, OldMake, NewMake columns</div>
+      <div class="dz-sub">works for any Lightspeed vertical — Marine, RV, Trailer, Golf, or Powersports — the format is matched automatically</div>
+      <span class="fmt-pill">.CSV</span>
+    </div>
+    <div id="file-chip-wrap"></div>
+    <div id="status-line"></div>
+  </div>
+
+  <div class="card" id="results-card" style="display:none;">
+    <div class="step"><div class="step-n">2</div><div class="step-label">Review &amp; export</div></div>
+    <div class="stats-row" id="stats-row"></div>
+    <div class="controls-row">
+      <select id="filter-select">
+        <option value="all">All rows</option>
+        <option value="flagged">🚩 Flagged for review</option>
+        <option value="exact">Exact match</option>
+        <option value="contains">Strong match</option>
+        <option value="fuzzy">Fuzzy match</option>
+        <option value="review">Needs review (no confident brand match)</option>
+        <option value="generic">Not a make</option>
+      </select>
+      <input type="text" id="search-box" placeholder="Search Old Make or New Make…" />
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Source</th><th>Old Make</th><th style="min-width:220px">New Make</th><th>Industry</th><th>Match</th></tr></thead>
+        <tbody id="tbl-body"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn" id="download-btn">⬇ Download Completed Mapping (.csv)</button>
+      <button class="btn btn-secondary" id="clear-btn">Clear all files</button>
+    </div>
+    <div class="note">
+      <strong>How this was built:</strong> Each Old Make value is normalized (trailing lengths, HP, and unit words stripped, common engine-brand shorthand like "MERC" expanded) and matched against a ~840-name canonical list spanning Marine, RV, Trailer, Golf Cart, and Powersports manufacturers, compiled from industry directories. <strong>Exact</strong> and <strong>Strong</strong> matches are auto-filled with high confidence; <strong>Fuzzy</strong> matches catch typos/misspellings and are worth a glance. Everything else is 🚩 <strong>flagged for review</strong> and defaults to <strong>OTHER</strong>: <strong>Not a make</strong> rows (unit numbers, placeholders, generic terms like "BOAT #12", "RENTAL", "PONTOON") were never a manufacturer name to begin with, and <strong>Needs review</strong> rows just didn't clear the confidence bar — those show the closest guess (if any) as a hint in case you'd rather use it. Both are marked with a 🚩 and can be isolated with the filter above. Every New Make value — suggested or typed — is saved in ALL CAPS. Edit any cell directly before exporting; nothing is uploaded anywhere, it all runs in your browser.
+    </div>
+  </div>
+</main>
+
+<footer>Runs entirely in your browser — nothing is uploaded anywhere.</footer>
+<script>
+const CANONICAL_MAKES = [
+  ['ACTION CRAFT','Marine'],
+  ['ALBEMARLE','Marine'],
+  ['ALLISON','Marine'],
+  ['ALOHA','Marine'],
+  ['ALUMACRAFT','Marine'],
+  ['ALUMAWELD','Marine'],
+  ['ALWELD','Marine'],
+  ['ANDROS BOATWORKS','Marine'],
+  ['ANGLER PRO BOATS','Marine'],
+  ['ANGLER QWEST','Marine'],
+  ['AQUA PATIO','Marine'],
+  ['AQUASPORT BOAT','Marine'],
+  ['AQUILA','Marine'],
+  ['ARIMA','Marine'],
+  ['AUSTIN PARKER','Marine'],
+  ['AVALON','Marine'],
+  ['AVIARA','Marine'],
+  ['AXIS','Marine'],
+  ['AXOPAR','Marine'],
+  ['AZIMUT','Marine'],
+  ['BALISE','Marine'],
+  ['BACK COVE YACHTS','Marine'],
+  ['BAJA','Marine'],
+  ['BARLETTA','Marine'],
+  ['BASS CAT','Marine'],
+  ['BAYLINER','Marine'],
+  ['BELZONA','Marine'],
+  ['BENETEAU','Marine'],
+  ['BENNINGTON','Marine'],
+  ['BENTLEY','Marine'],
+  ['BERKSHIRE','Marine'],
+  ['BERTRAM','Marine'],
+  ['BLACKFIN','Marine'],
+  ['BLACKJACK','Marine'],
+  ['BLACKWOOD','Marine'],
+  ['BLAZER','Marine'],
+  ['BLUE WAVE','Marine'],
+  ['BLUEWATER BOATS','Marine'],
+  ['BONADEO BOATWORKS','Marine'],
+  ['BOSTON WHALER','Marine'],
+  ['BOULTON POWERBOATS','Marine'],
+  ['BROADWATER','Marine'],
+  ['BRYANT','Marine'],
+  ['BUDDY DAVIS','Marine'],
+  ['BULLET BOATS','Marine'],
+  ['BURGER','Marine'],
+  ['C DORY','Marine'],
+  ['C HAWK','Marine'],
+  ['CALABRIA','Marine'],
+  ['CAMPION','Marine'],
+  ['CAPE CRAFT BOATS','Marine'],
+  ['CAPE HORN','Marine'],
+  ['CARAVELLE','Marine'],
+  ['CAROLINA SKIFF','Marine'],
+  ['CARVER','Marine'],
+  ['CAYMAS','Marine'],
+  ['CENTURION','Marine'],
+  ['CENTURY','Marine'],
+  ['CHAPARRAL','Marine'],
+  ['CHARGER','Marine'],
+  ['CHRIS CRAFT','Marine'],
+  ['CIGARETTE','Marine'],
+  ['CLEARWATER BOATS','Marine'],
+  ['COBALT','Marine'],
+  ['COBIA','Marine'],
+  ['CONCEPT BOATS','Marine'],
+  ['CONTENDER','Marine'],
+  ['CRANCHI','Marine'],
+  ['CREST','Marine'],
+  ['CRESTLINER','Marine'],
+  ['CREVALLE','Marine'],
+  ['CROWNLINE','Marine'],
+  ['CRUISERS','Marine'],
+  ['CUSTOM WELD','Marine'],
+  ['CUTWATER','Marine'],
+  ['CYPRESS CAY','Marine'],
+  ['DARGEL','Marine'],
+  ['DEFIANCE','Marine'],
+  ['DEEP IMPACT','Marine'],
+  ['DONZI','Marine'],
+  ['DUCKWORTH','Marine'],
+  ['DURACRAFT','Marine'],
+  ['DUSKY','Marine'],
+  ['EASTERN BOATS','Marine'],
+  ['EBBTIDE','Marine'],
+  ['EDGEWATER','Marine'],
+  ['EGG HARBOR','Marine'],
+  ['EGRET','Marine'],
+  ['EPIC BOATS','Marine'],
+  ['EVERGLADES','Marine'],
+  ['EVINRUDE','Marine'],
+  ['EXCEL BOATS','Marine'],
+  ['EXPLORER','Marine'],
+  ['FAIRLINE','Marine'],
+  ['FIESTA','Marine'],
+  ['FLOECRAFT','Marine'],
+  ['FORESTER','Marine'],
+  ['FORMULA','Marine'],
+  ['FOUNTAIN','Marine'],
+  ['FREEMAN BOATWORKS','Marine'],
+  ['FOUNTAINE PAJOT','Marine'],
+  ['FOUR WINNS','Marine'],
+  ['FRONTIER BOATS','Marine'],
+  ['G3','Marine'],
+  ['GAMBLER','Marine'],
+  ['GATOR TAIL','Marine'],
+  ['GATOR TRAX','Marine'],
+  ['GEKKO','Marine'],
+  ['GLASTRON','Marine'],
+  ['GO DEVIL','Marine'],
+  ['GODFREY','Marine'],
+  ['GRADY WHITE','Marine'],
+  ['GREENLINE YACHTS','Marine'],
+  ['GULF COAST BAY BOATS','Marine'],
+  ['HANKOS','Marine'],
+  ['HARRIS','Marine'],
+  ['HATTERAS','Marine'],
+  ['HAYNIE','Marine'],
+  ['HYDRA SPORTS','Marine'],
+  ['HELLS BAY','Marine'],
+  ['HEWES','Marine'],
+  ['HEWES CRAFT','Marine'],
+  ['HEYDAY','Marine'],
+  ['HONDA MARINE','Marine'],
+  ['HUCKINS','Marine'],
+  ['HUNT YACHTS','Marine'],
+  ['HURRICANE','Marine'],
+  ['INSETTA','Marine'],
+  ['INTREPID','Marine'],
+  ['INVINCIBLE BOATS','Marine'],
+  ['ISLAND BOATS','Marine'],
+  ['J C MANUFACTURING','Marine'],
+  ['JEANNEAU','Marine'],
+  ['JONES BROTHERS','Marine'],
+  ['JUPITER','Marine'],
+  ['KADEY-KROGEN','Marine'],
+  ['KENCRAFT','Marine'],
+  ['KEY WEST','Marine'],
+  ['LAGOON','Marine'],
+  ['LAKE & BAY','Marine'],
+  ['LANDAU','Marine'],
+  ['LARSON','Marine'],
+  ['LEGEND BOATS','Marine'],
+  ['LEISURE KRAFT','Marine'],
+  ['LEOPARD CATAMARANS','Marine'],
+  ['LIMESTONE','Marine'],
+  ['LOWE','Marine'],
+  ['LUND','Marine'],
+  ['MAJEK','Marine'],
+  ['MAKO','Marine'],
+  ['MALIBU','Marine'],
+  ['MANITOU','Marine'],
+  ['MARES','Marine'],
+  ['MARITIME SKIFF','Marine'],
+  ['MARITIMO','Marine'],
+  ['MARLOW PILOT','Marine'],
+  ['MARQUIS','Marine'],
+  ['MASTERCRAFT','Marine'],
+  ['MAVERICK','Marine'],
+  ['MAY-CRAFT','Marine'],
+  ['MB SPORTS','Marine'],
+  ['MCKEE CRAFT','Marine'],
+  ['MERIDIAN','Marine'],
+  ['MERCURY','Marine'],
+  ['MIDNIGHT EXPRESS','Marine'],
+  ['MIKELSON YACHTS','Marine'],
+  ['MIRROCRAFT','Marine'],
+  ['MJM YACHTS','Marine'],
+  ['MONTARA','Marine'],
+  ['MONTEGO BAY','Marine'],
+  ['MONTEREY','Marine'],
+  ['MOOMBA','Marine'],
+  ['NAUTIC STAR','Marine'],
+  ['NAUTIQUE','Marine'],
+  ['NITRO','Marine'],
+  ['NORDIC TUGS','Marine'],
+  ['NOR-TECH','Marine'],
+  ['NORTH RIVER','Marine'],
+  ['NORTHCOAST','Marine'],
+  ['NORTHWEST BOATS','Marine'],
+  ['OCEAN YACHT','Marine'],
+  ['OKEAN YACHTS','Marine'],
+  ['PAIR BOATS','Marine'],
+  ['PALM BEACH','Marine'],
+  ['PALMER JOHNSON','Marine'],
+  ['PANGA','Marine'],
+  ['PARKER MARINE','Marine'],
+  ['PATHFINDER','Marine'],
+  ['PHENOM','Marine'],
+  ['PHOENIX','Marine'],
+  ['PIONEER','Marine'],
+  ['PLAYCRAFT','Marine'],
+  ['POLAR KRAFT','Marine'],
+  ['POND KING','Marine'],
+  ['PREMIER','Marine'],
+  ['PRESTIGE YACHTS','Marine'],
+  ['PRINCECRAFT','Marine'],
+  ['PRO DRIVE','Marine'],
+  ['PRO LINE','Marine'],
+  ['PURSUIT','Marine'],
+  ['QWEST','Marine'],
+  ['RAIDER','Marine'],
+  ['RAMPAGE','Marine'],
+  ['RANGER','Marine'],
+  ['RANGER TUGS','Marine'],
+  ['REEL PURSUIT','Marine'],
+  ['REGAL','Marine'],
+  ['REGENCY','Marine'],
+  ['REGULATOR','Marine'],
+  ['RINKER','Marine'],
+  ['RIVER HAWK','Marine'],
+  ['RIVIERA','Marine'],
+  ['ROBALO','Marine'],
+  ['ROGUE MARINE','Marine'],
+  ['SABRE YACHTS','Marine'],
+  ['SAILFISH','Marine'],
+  ['SANGER','Marine'],
+  ['SANPAN','Marine'],
+  ['SCARAB','Marine'],
+  ['SCOUT','Marine'],
+  ['SEA BORN','Marine'],
+  ['SEA CHASER','Marine'],
+  ['SEA FORCE IX','Marine'],
+  ['SEA FOX','Marine'],
+  ['SEA HUNT','Marine'],
+  ['SEA PRO','Marine'],
+  ['SEA RAY','Marine'],
+  ['SEA VEE','Marine'],
+  ['SEAARK','Marine'],
+  ['SEAHUNTER','Marine'],
+  ['SEALINE','Marine'],
+  ['SHALLOW SPORT','Marine'],
+  ['SHEARWATER','Marine'],
+  ['SHOALWATER','Marine'],
+  ['SILVERTON','Marine'],
+  ['SKEETER','Marine'],
+  ['SMOKER CRAFT','Marine'],
+  ['SOUTH BAY','Marine'],
+  ['SOUTHFORK','Marine'],
+  ['SOUTHPORT','Marine'],
+  ['SOUTHWIND','Marine'],
+  ['SPLENDOR','Marine'],
+  ['SPORTSMAN','Marine'],
+  ['STAMAS YACHT','Marine'],
+  ['STARCRAFT','Marine'],
+  ['STEIGERCRAFT','Marine'],
+  ['STERLING','Marine'],
+  ['STINGRAY','Marine'],
+  ['STRIPER','Marine'],
+  ['SUN TRACKER','Marine'],
+  ['SUNCATCHER','Marine'],
+  ['SUNCHASER','Marine'],
+  ['SUNDANCE','Marine'],
+  ['SUPRA','Marine'],
+  ['SUPREME','Marine'],
+  ['SWEETWATER','Marine'],
+  ['SYLVAN','Marine'],
+  ['TAHOE','Marine'],
+  ['TAHOE PONTOONS','Marine'],
+  ['THUNDER JET','Marine'],
+  ['TIARA','Marine'],
+  ['TIDEWATER','Marine'],
+  ['TIGE','Marine'],
+  ['TRACKER','Marine'],
+  ['TRAN SPORT','Marine'],
+  ['TRIFECTA','Marine'],
+  ['TRITON','Marine'],
+  ['TRIUMPH','Marine'],
+  ['TWIN VEE','Marine'],
+  ['VANDERBILT','Marine'],
+  ['VANDUTCH','Marine'],
+  ['VARATTI','Marine'],
+  ['VELOCITY POWERBOATS','Marine'],
+  ['VERANDA','Marine'],
+  ['VEXUS','Marine'],
+  ['VIAGGIO','Marine'],
+  ['VIKING YACHT','Marine'],
+  ['VORTEX BOATS','Marine'],
+  ['WAR EAGLE','Marine'],
+  ['WARRIOR','Marine'],
+  ['WELDBILT','Marine'],
+  ['WELD-CRAFT','Marine'],
+  ['WELDCRAFT MARINE','Marine'],
+  ['WELLCRAFT','Marine'],
+  ['WHITEWATER','Marine'],
+  ['WILLIE BOATS','Marine'],
+  ['WOOLDRIDGE','Marine'],
+  ['WORLD CAT','Marine'],
+  ['YELLOWFIN','Marine'],
+  ['XCURSION','Marine'],
+  ['XPRESS','Marine'],
+  ['YAMAHA','Marine'],
+  ['YAR-CRAFT','Marine'],
+  ['SEA DOO','Marine'],
+  ['SUZUKI','Marine'],
+  ['TOHATSU','Marine'],
+  ['ADVENTURER MANUFACTURING','RV'],
+  ['AEONRV','RV'],
+  ['AIRSTREAM','RV'],
+  ['ALINER','RV'],
+  ['ALLEN CAMPER MANUFACTURING','RV'],
+  ['ALLIANCE RV','RV'],
+  ['AMERICAN COACH','RV'],
+  ['ARMADILLO TRAILER MANUFACTURING','RV'],
+  ['BACKWATER RV','RV'],
+  ['BIGFOOT INDUSTRIES','RV'],
+  ['BLUE BIRD','RV'],
+  ['BLUE MOUNTAIN CAMPER CO','RV'],
+  ['BOWLUS','RV'],
+  ['BRAXTON CREEK','RV'],
+  ['BRINKLEY RV','RV'],
+  ['CAPRI CAMPER','RV'],
+  ['CASITA TRAVEL TRAILERS','RV'],
+  ['CHALET','RV'],
+  ['COACH HOUSE','RV'],
+  ['COACHMEN','RV'],
+  ['COLEMAN','RV'],
+  ['CORTES CAMPERS','RV'],
+  ['COUNTRY COACH','RV'],
+  ['CROSSROADS RV','RV'],
+  ['CRUISER RV','RV'],
+  ['DRV LUXURY SUITES','RV'],
+  ['DUTCHMEN','RV'],
+  ['DYNAMAX','RV'],
+  ['EARTHROAMER','RV'],
+  ['EAST TO WEST RV','RV'],
+  ['ECLIPSE RECREATIONAL VEHICLES','RV'],
+  ['ELDDIS','RV'],
+  ['EMBASSY RV','RV'],
+  ['EMBER RV','RV'],
+  ['ENCORE RECREATIONAL VEHICLES','RV'],
+  ['ENTEGRA COACH','RV'],
+  ['ESCAPE TRAILER INDUSTRIES','RV'],
+  ['ESCAPOD TRAILERS','RV'],
+  ['SCAMP','RV'],
+  ['FLEETWOOD','RV'],
+  ['FOREST RIVER','RV'],
+  ['FORETRAVEL','RV'],
+  ['GENESIS SUPREME RV','RV'],
+  ['GRAND DESIGN','RV'],
+  ['GRECH RV','RV'],
+  ['GULF STREAM COACH','RV'],
+  ['HAPPIER CAMPER','RV'],
+  ['HEARTLAND RV','RV'],
+  ['HIGHLAND RIDGE RV','RV'],
+  ['HIKER TRAILERS','RV'],
+  ['HOLIDAY RAMBLER','RV'],
+  ['HOST CAMPERS','RV'],
+  ['INTECH RV','RV'],
+  ['ITASCA','RV'],
+  ['JAYCO','RV'],
+  ['K-Z RV','RV'],
+  ['KEYSTONE RV','RV'],
+  ['LANCE CAMPER','RV'],
+  ['LEISURE TRAVEL VANS','RV'],
+  ['LITTLE GUY TRAILERS','RV'],
+  ['LUXE','RV'],
+  ['MARATHON COACH','RV'],
+  ['MIDWEST AUTOMOTIVE DESIGN','RV'],
+  ['MONACO COACH','RV'],
+  ['NEW HORIZONS RV','RV'],
+  ['NEWELL','RV'],
+  ['NEWMAR','RV'],
+  ['NEXUS RV','RV'],
+  ['NORTHERN LITE','RV'],
+  ['NORTHSTAR CAMPERS','RV'],
+  ['NORTHWOOD MANUFACTURING','RV'],
+  ['NUCAMP RV','RV'],
+  ['OLD SCHOOL TRAILERS','RV'],
+  ['OLIVER TRAVEL TRAILERS','RV'],
+  ['OUTDOORS RV','RV'],
+  ['PALOMINO','RV'],
+  ['PANORAMIC RV','RV'],
+  ['PHOENIX USA RV','RV'],
+  ['PLEASURE-WAY','RV'],
+  ['PREVOST','RV'],
+  ['PRIME TIME','RV'],
+  ['REGENCY RV','RV'],
+  ['RENEGADE RV','RV'],
+  ['RIVERSIDE RV','RV'],
+  ['ROADTREK','RV'],
+  ['RUGGED MOUNTAIN RV','RV'],
+  ['RUNAWAY CAMPERS','RV'],
+  ['RUSTIC TRAIL TEARDROP CAMPERS','RV'],
+  ['SAFARI CONDO','RV'],
+  ['SHASTA','RV'],
+  ['SPORTSMOBILE','RV'],
+  ['STARCRAFT','RV'],
+  ['SUNSET PARK RV','RV'],
+  ['TAYLOR COACH','RV'],
+  ['THE RV FACTORY','RV'],
+  ['THOR MOTOR COACH','RV'],
+  ['TIFFIN MOTORHOMES','RV'],
+  ['TRAVEL LITE RV','RV'],
+  ['TRIPLE E RECREATIONAL VEHICLES','RV'],
+  ['VANLEIGH RV','RV'],
+  ['VENTURE RV','RV'],
+  ['WEEROLL CAMPERS','RV'],
+  ['WINNEBAGO','RV'],
+  ['XPLOR CAMPERS','RV'],
+  ['XPLORER MOTORHOMES','RV'],
+  ['102 IRONWORKS','Trailer'],
+  ['4-STAR','Trailer'],
+  ['5 STAR TRAILERS','Trailer'],
+  ['ACSI','Trailer'],
+  ['ADAM','Trailer'],
+  ['AIR-TOW','Trailer'],
+  ['ALCOM OFFROAD','Trailer'],
+  ['ALUMA','Trailer'],
+  ['ALUMAICE','Trailer'],
+  ['AMERICAN FREEDOM','Trailer'],
+  ['AMERICAN HAULER','Trailer'],
+  ['AMO','Trailer'],
+  ['ANDERSON','Trailer'],
+  ['ANVIL','Trailer'],
+  ['APOGEE','Trailer'],
+  ['APPALACHIAN','Trailer'],
+  ['ARISING','Trailer'],
+  ['ARROW TRAIL','Trailer'],
+  ['ATC','Trailer'],
+  ['BARRETT TRAILERS','Trailer'],
+  ['BASELINE','Trailer'],
+  ['BCL FABRICATION','Trailer'],
+  ['BEAR TRACK','Trailer'],
+  ['BEE','Trailer'],
+  ['BEHNKE TRAILERS','Trailer'],
+  ['BELMONT','Trailer'],
+  ['BELSHE','Trailer'],
+  ['BETTER BUILT','Trailer'],
+  ['BIG BUBBA\'S TRAILERS','Trailer'],
+  ['BIG HORN','Trailer'],
+  ['BIG TEX','Trailer'],
+  ['BIGFOOT','Trailer'],
+  ['BISON','Trailer'],
+  ['BLACK LABEL','Trailer'],
+  ['BLACK RHINO','Trailer'],
+  ['BLAZER','Trailer'],
+  ['BLIZZARD','Trailer'],
+  ['BLOOMER','Trailer'],
+  ['BOCKMANN','Trailer'],
+  ['BONANZA','Trailer'],
+  ['BOSS TRAILERS','Trailer'],
+  ['BRAVO TRAILERS','Trailer'],
+  ['BRI-MAR','Trailer'],
+  ['BUCKEYE','Trailer'],
+  ['BWISE','Trailer'],
+  ['CALIBER','Trailer'],
+  ['CALICO','Trailer'],
+  ['CAM SUPERLINE','Trailer'],
+  ['CAR MATE','Trailer'],
+  ['CARGO CRAFT','Trailer'],
+  ['CARGO EXPRESS','Trailer'],
+  ['CARGO MATE','Trailer'],
+  ['CARGO PRO','Trailer'],
+  ['CARRY-ON','Trailer'],
+  ['CELLTECH','Trailer'],
+  ['CIMARRON','Trailer'],
+  ['CM TRAILERS','Trailer'],
+  ['COFFEE CREEK','Trailer'],
+  ['COMMANDER TRAILERS','Trailer'],
+  ['CONTINENTAL','Trailer'],
+  ['CONTINENTAL CARGO','Trailer'],
+  ['COOSE','Trailer'],
+  ['CORN PRO','Trailer'],
+  ['COUNTRY BLACKSMITH','Trailer'],
+  ['CROSS TRAILERS','Trailer'],
+  ['CURRAHEE','Trailer'],
+  ['DARKHORSE CARGO','Trailer'],
+  ['DAVIDSON TRAILERS','Trailer'],
+  ['DELCO','Trailer'],
+  ['DELTA','Trailer'],
+  ['DEMCO','Trailer'],
+  ['DIAMOND C','Trailer'],
+  ['DIAMOND CARGO','Trailer'],
+  ['DIAMOND K','Trailer'],
+  ['DIAMOND T','Trailer'],
+  ['DNJ TRAILERS','Trailer'],
+  ['DOOLITTLE','Trailer'],
+  ['DOUBLE D','Trailer'],
+  ['DOWN 2 EARTH','Trailer'],
+  ['DP PLATINUM STAR','Trailer'],
+  ['DRIVE TRAILERS','Trailer'],
+  ['DUMP-RITE','Trailer'],
+  ['DURA-HAUL','Trailer'],
+  ['EAGER BEAVER','Trailer'],
+  ['EAST TEXAS TRAILERS','Trailer'],
+  ['EBY','Trailer'],
+  ['ECHO','Trailer'],
+  ['ECLIPSE','Trailer'],
+  ['ECONO-TRAILER','Trailer'],
+  ['EDGE','Trailer'],
+  ['ELITE TRAILERS','Trailer'],
+  ['EMPIRE CARGO','Trailer'],
+  ['EQUINE MOTORCOACH','Trailer'],
+  ['ERA','Trailer'],
+  ['EXISS','Trailer'],
+  ['EXPRESS','Trailer'],
+  ['EZ HAULER','Trailer'],
+  ['EZ LOADER','Trailer'],
+  ['FEATHERLITE','Trailer'],
+  ['FELLING','Trailer'],
+  ['FINISH LINE','Trailer'],
+  ['FLATTRAK','Trailer'],
+  ['FLOE','Trailer'],
+  ['FORMULA','Trailer'],
+  ['FREEDOM TRAILERS','Trailer'],
+  ['FRIESEN','Trailer'],
+  ['FRONTIER','Trailer'],
+  ['GATORMADE','Trailer'],
+  ['GOLD RUSH','Trailer'],
+  ['GOODGUYS TRAILERS','Trailer'],
+  ['GPS TRAILERS','Trailer'],
+  ['GR','Trailer'],
+  ['GREAT NORTHERN','Trailer'],
+  ['GRIFFIN','Trailer'],
+  ['H&H','Trailer'],
+  ['HARDCORE','Trailer'],
+  ['HART','Trailer'],
+  ['HAUL ABOUT','Trailer'],
+  ['HAULIN TRAILERS','Trailer'],
+  ['HAULMARK','Trailer'],
+  ['HAWK TRAILERS','Trailer'],
+  ['HAWKE','Trailer'],
+  ['HIGH COUNTRY CARGO','Trailer'],
+  ['HIGH COUNTRY TRAILERS','Trailer'],
+  ['HILLCREST TRAILERS','Trailer'],
+  ['HILLSBORO','Trailer'],
+  ['HOMESTEADER','Trailer'],
+  ['HORIZON TRAILERS','Trailer'],
+  ['HTC','Trailer'],
+  ['HULL & PORTER','Trailer'],
+  ['IDEAL CARGO','Trailer'],
+  ['IFOR WILLIAMS','Trailer'],
+  ['IMPACT TRAILERS','Trailer'],
+  ['IMPERIAL','Trailer'],
+  ['INDUSTRIAS AMERICA','Trailer'],
+  ['INTECH','Trailer'],
+  ['INTERSTATE','Trailer'],
+  ['IRON BULL','Trailer'],
+  ['IRONSTAR','Trailer'],
+  ['JAMCO','Trailer'],
+  ['KARAVAN','Trailer'],
+  ['KAUFMAN','Trailer'],
+  ['KENDON','Trailer'],
+  ['KIEFER','Trailer'],
+  ['KINGSTON','Trailer'],
+  ['KRAFTSMAN','Trailer'],
+  ['LAKOTA','Trailer'],
+  ['LAMAR','Trailer'],
+  ['LEGEND','Trailer'],
+  ['LEGEND X','Trailer'],
+  ['LIBERTY','Trailer'],
+  ['LIGHTNING TRAILERS','Trailer'],
+  ['LOAD RITE','Trailer'],
+  ['LOAD TRAIL','Trailer'],
+  ['LOGAN COACH','Trailer'],
+  ['LOOK','Trailer'],
+  ['MAGIC TILT','Trailer'],
+  ['MAJESTIC','Trailer'],
+  ['MASTER TOW','Trailer'],
+  ['MAVERICK TRAILERS','Trailer'],
+  ['MAXX-D','Trailer'],
+  ['MCT','Trailer'],
+  ['MEB TRAILER','Trailer'],
+  ['MERHOW','Trailer'],
+  ['METAL CRAFT','Trailer'],
+  ['MIDSOTA','Trailer'],
+  ['MISKA','Trailer'],
+  ['MISSION TRAILERS','Trailer'],
+  ['MORITZ','Trailer'],
+  ['MTI','Trailer'],
+  ['NATIONCRAFT','Trailer'],
+  ['NEO TRAILERS','Trailer'],
+  ['NEXHAUL','Trailer'],
+  ['NITRO','Trailer'],
+  ['NORDTEK','Trailer'],
+  ['NORSTAR','Trailer'],
+  ['OZARK TRAILERS','Trailer'],
+  ['PACE AMERICAN','Trailer'],
+  ['PEACH CARGO','Trailer'],
+  ['PEQUEA','Trailer'],
+  ['PJ TRAILERS','Trailer'],
+  ['PLATINUM COACH','Trailer'],
+  ['POLAR KING','Trailer'],
+  ['PREMIER','Trailer'],
+  ['PROSPECTOR TRAILERS','Trailer'],
+  ['PUNCH TRAILERS','Trailer'],
+  ['QUALITY CARGO','Trailer'],
+  ['QUALITY STEEL','Trailer'],
+  ['QUALITY TRAILERS','Trailer'],
+  ['R&R','Trailer'],
+  ['RANCE','Trailer'],
+  ['RANCH KING TRAILERS','Trailer'],
+  ['RAWMAXX','Trailer'],
+  ['RC TRAILERS','Trailer'],
+  ['RED RIVER','Trailer'],
+  ['RETCO','Trailer'],
+  ['RICE TRAILERS','Trailer'],
+  ['RIVER VALLEY','Trailer'],
+  ['ROAD KING','Trailer'],
+  ['ROAD WARRIOR','Trailer'],
+  ['ROCK SOLID CARGO','Trailer'],
+  ['ROCKIN\' S','Trailer'],
+  ['ROLLIN-S','Trailer'],
+  ['ROLLS RITE TRAILERS','Trailer'],
+  ['ROYAL CARGO','Trailer'],
+  ['ROYAL T TRAILERS','Trailer'],
+  ['S&S TRAILERS','Trailer'],
+  ['SAUBER','Trailer'],
+  ['SAWYER TRAILERS','Trailer'],
+  ['SHADOW','Trailer'],
+  ['SHIFTR','Trailer'],
+  ['SHORELANDER','Trailer'],
+  ['SHOW HAULER','Trailer'],
+  ['SILVER STAR','Trailer'],
+  ['SIRIUS','Trailer'],
+  ['SMC','Trailer'],
+  ['SNAKE RIVER','Trailer'],
+  ['SNOPRO','Trailer'],
+  ['SOONER','Trailer'],
+  ['SOUTH GEORGIA CARGO','Trailer'],
+  ['SOUTHLAND','Trailer'],
+  ['SPARTAN TRAILERS','Trailer'],
+  ['STALLION','Trailer'],
+  ['STARLITE','Trailer'],
+  ['STEALTH','Trailer'],
+  ['STEEL PINES CARGO','Trailer'],
+  ['STEELBOYZ','Trailer'],
+  ['STEHL','Trailer'],
+  ['STOLL','Trailer'],
+  ['STRYKER','Trailer'],
+  ['SUMMIT TRAILER','Trailer'],
+  ['SUN COUNTRY TRAILERS','Trailer'],
+  ['SUNDOWNER','Trailer'],
+  ['SUPERIOR TRAILERS','Trailer'],
+  ['SURE-TRAC','Trailer'],
+  ['SWIFT BUILT','Trailer'],
+  ['TAMAQUA','Trailer'],
+  ['TAYLOR TRAILERS','Trailer'],
+  ['TEXAS BRAGG','Trailer'],
+  ['TEXAS PRIDE','Trailer'],
+  ['TEXLINE TRAILERS','Trailer'],
+  ['TEXOMA TRAILERS','Trailer'],
+  ['THUNDER CREEK EQUIPMENT','Trailer'],
+  ['THURO-BILT','Trailer'],
+  ['TIGER TRAILERS','Trailer'],
+  ['TIMPTE','Trailer'],
+  ['TITAN','Trailer'],
+  ['TOP HAT','Trailer'],
+  ['TRAIL KING','Trailer'],
+  ['TRAIL-ET','Trailer'],
+  ['TRAILER EXPRESS','Trailer'],
+  ['TRAILER WORLD','Trailer'],
+  ['TRAILERMAN TRAILERS','Trailer'],
+  ['TRAILEX','Trailer'],
+  ['TRAILMAXX','Trailer'],
+  ['TRAILS WEST','Trailer'],
+  ['TRAILSTAR','Trailer'],
+  ['TRIPLE CROWN','Trailer'],
+  ['TRIPLE L','Trailer'],
+  ['TRITON','Trailer'],
+  ['TUFF DAWG','Trailer'],
+  ['TWISTER','Trailer'],
+  ['U-DUMP','Trailer'],
+  ['UNITED TRAILERS','Trailer'],
+  ['US CARGO','Trailer'],
+  ['USA CARGO','Trailer'],
+  ['VALLEY TRAILERS','Trailer'],
+  ['VENTURE','Trailer'],
+  ['WARNER','Trailer'],
+  ['WATCHDOG TRAILERS','Trailer'],
+  ['WELLS CARGO','Trailer'],
+  ['WILSON','Trailer'],
+  ['WW TRAILER','Trailer'],
+  ['XPRESS TRAILERS','Trailer'],
+  ['YACHT CLUB','Trailer'],
+  ['ZIMMERMAN','Trailer'],
+  ['CLUB CAR','Golf Cart'],
+  ['E-Z-GO','Golf Cart'],
+  ['YAMAHA','Golf Cart'],
+  ['CUSHMAN','Golf Cart'],
+  ['STAR EV','Golf Cart'],
+  ['ICON EV','Golf Cart'],
+  ['EVOLUTION','Golf Cart'],
+  ['TOMBERLIN','Golf Cart'],
+  ['BINTELLI','Golf Cart'],
+  ['DENAGO','Golf Cart'],
+  ['GARIA','Golf Cart'],
+  ['POLARIS GEM','Golf Cart'],
+  ['AMERICAN SPORTWORKS','Golf Cart'],
+  ['ADVANCED EV','Golf Cart'],
+  ['KANDI','Golf Cart'],
+  ['HDK','Golf Cart'],
+  ['MASSIMO','Golf Cart'],
+  ['COLEMAN','Golf Cart'],
+  ['MOKE','Golf Cart'],
+  ['VANTAGE','Golf Cart'],
+  ['CIRCLE EV','Golf Cart'],
+  ['TAYLOR-DUNN','Golf Cart'],
+  ['PAR CAR','Golf Cart'],
+  ['AMERICAN CUSTOM GOLF CARS','Golf Cart'],
+  ['MELEX','Golf Cart'],
+  ['VIVID EV','Golf Cart'],
+  ['VOYAGER EV','Golf Cart'],
+  ['AETRIC EV','Golf Cart'],
+  ['MAMMOTH EV','Golf Cart'],
+  ['VENOM EV','Golf Cart'],
+  ['ALSET EV','Golf Cart'],
+  ['EV TITAN','Golf Cart'],
+  ['TROJAN EV','Golf Cart'],
+  ['KODIAK EV','Golf Cart'],
+  ['V CARTS','Golf Cart'],
+  ['LANDMASTER','Golf Cart'],
+  ['BEAST','Golf Cart'],
+  ['VITACCI','Golf Cart'],
+  ['MOTO EV','Golf Cart'],
+  ['VIKING EV','Golf Cart'],
+  ['EXCAR','Golf Cart'],
+  ['MARSHELL','Golf Cart'],
+  ['TAO MOTOR','Golf Cart'],
+  ['MADJAX','Golf Cart'],
+  ['HUNTVE','Golf Cart'],
+  ['LEGION EV','Golf Cart'],
+  ['OLYMPUS LSV','Golf Cart'],
+  ['CROWN CARTS','Golf Cart'],
+  ['SPARTAN EV','Golf Cart'],
+  ['ENVY GOLF CART','Golf Cart'],
+  ['MANTIS','Golf Cart'],
+  ['ELLWEE','Golf Cart'],
+  ['FREEDOM CARTS','Golf Cart'],
+  ['HONOR LSV','Golf Cart'],
+  ['MAC EV','Golf Cart'],
+  ['DYNAMIC CARTS','Golf Cart'],
+  ['SUNDAY CARTS','Golf Cart'],
+  ['UNITED SMART EV','Golf Cart'],
+  ['SPREE EV','Golf Cart'],
+  ['TORO','Golf Cart'],
+  ['SIERRA LSV','Golf Cart'],
+  ['ACTIVE EV','Golf Cart'],
+  ['BREEZY EV','Golf Cart'],
+  ['NEVO EV','Golf Cart'],
+  ['VIPER CART USA','Golf Cart'],
+  ['VOLCON','Golf Cart'],
+  ['FUSION CARTS','Golf Cart'],
+  ['SOLANA EV','Golf Cart'],
+  ['BAD BOY BUGGIES','Golf Cart'],
+  ['ATLAS','Golf Cart'],
+  ['GORILLA RIDES EV','Golf Cart'],
+  ['ROYAL EV','Golf Cart'],
+  ['IRONBULL CART','Golf Cart'],
+  ['POLARIS','Powersports'],
+  ['CAN-AM','Powersports'],
+  ['YAMAHA','Powersports'],
+  ['HONDA','Powersports'],
+  ['KAWASAKI','Powersports'],
+  ['SUZUKI','Powersports'],
+  ['ARCTIC CAT','Powersports'],
+  ['CFMOTO','Powersports'],
+  ['SSR MOTORSPORTS','Powersports'],
+  ['KYMCO','Powersports'],
+  ['CUB CADET','Powersports'],
+  ['JOHN DEERE','Powersports'],
+  ['TEXTRON OFF ROAD','Powersports'],
+  ['ODES','Powersports'],
+  ['SEGWAY POWERSPORTS','Powersports'],
+  ['HISUN','Powersports'],
+  ['MASSIMO','Powersports'],
+  ['BENNCHE','Powersports'],
+  ['TRAILMASTER','Powersports'],
+  ['CECTEK','Powersports'],
+  ['LINHAI','Powersports'],
+  ['INTIMIDATOR','Powersports'],
+  ['CROSSFIRE','Powersports'],
+  ['KIOTI','Powersports'],
+  ['MAHINDRA ROXOR','Powersports'],
+  ['AMERICAN LANDMASTER','Powersports'],
+  ['COLEMAN POWERSPORTS','Powersports'],
+  ['TRACKER OFF ROAD','Powersports'],
+  ['BAD BOY OFF ROAD','Powersports'],
+  ['ARGO','Powersports'],
+  ['KUBOTA','Powersports'],
+  ['BOBCAT','Powersports'],
+  ['CASE IH','Powersports'],
+  ['MASSEY FERGUSON','Powersports'],
+  ['NEW HOLLAND','Powersports'],
+  ['GRAVELY','Powersports'],
+  ['KAYO','Powersports'],
+  ['TGB','Powersports'],
+  ['HAMMERHEAD OFF-ROAD','Powersports'],
+  ['BAJA MOTORSPORTS','Powersports'],
+  ['RIVAL POWERSPORTS','Powersports'],
+  ['VOLCON','Powersports'],
+  ['HARLEY-DAVIDSON','Powersports'],
+  ['DUCATI','Powersports'],
+  ['BMW','Powersports'],
+  ['TRIUMPH','Powersports'],
+  ['KTM','Powersports'],
+  ['INDIAN','Powersports'],
+  ['ROYAL ENFIELD','Powersports'],
+  ['HUSQVARNA','Powersports'],
+  ['APRILIA','Powersports'],
+  ['MOTO GUZZI','Powersports'],
+  ['VESPA','Powersports'],
+  ['ZERO MOTORCYCLES','Powersports'],
+  ['VICTORY MOTORCYCLES','Powersports'],
+  ['BUELL','Powersports'],
+  ['MV AGUSTA','Powersports'],
+  ['BIMOTA','Powersports'],
+  ['BETA','Powersports'],
+  ['GASGAS','Powersports'],
+  ['SHERCO','Powersports'],
+  ['URAL','Powersports'],
+  ['CSC MOTORCYCLES','Powersports'],
+  ['JANUS MOTORCYCLES','Powersports'],
+  ['LIVEWIRE','Powersports'],
+  ['ENERGICA','Powersports'],
+  ['LIGHTNING MOTORCYCLE','Powersports'],
+  ['HYOSUNG','Powersports'],
+  ['DAELIM','Powersports'],
+  ['GENUINE SCOOTER CO','Powersports'],
+  ['SYM','Powersports'],
+  ['PIAGGIO','Powersports'],
+  ['BENELLI','Powersports'],
+  ['SWM','Powersports'],
+  ['NORTON','Powersports'],
+  ['CLEVELAND CYCLEWERKS','Powersports'],
+  ['RIEJU','Powersports'],
+  ['FANTIC','Powersports'],
+  ['TM RACING','Powersports'],
+  ['TAOTAO','Powersports'],
+  ['ROKETA','Powersports'],
+  ['X-PRO','Powersports'],
+  ['LANCE POWERSPORTS','Powersports'],
+  ['NIU','Powersports'],
+  ['SUPER73','Powersports'],
+  ['QJMOTOR','Powersports'],
+  ['SKI-DOO','Powersports'],
+  ['TAIGA MOTORS','Powersports'],
+  ['SEA-DOO','Powersports'],
+  ['YAMAHA WAVERUNNER','Powersports'],
+  ['SLINGSHOT','Powersports'],
+  ['VANDERHALL','Powersports'],
+];</script>
+<script>
+// ============================================================================
+// Make Mapping Assistant — standardizes messy customer-entered "make" values
+// (boats, RVs, trailers, golf carts, powersports) against a canonical
+// multi-industry manufacturer list, for dealer-data-migration mapping files
+// shaped like: Source, OldMake, NewMake. Runs entirely client-side.
+// ============================================================================
+
+(function () {
+  'use strict';
+
+  // ---- Canonical reference data: [name, industry] pairs ---------------------
+  // (CANONICAL_MAKES is defined in a separate inlined script block)
+
+  // A handful of unambiguous shorthand tokens seen in real dealer data —
+  // applied only to a whole token (never a substring) before matching, so
+  // "MERC" in "4HP MERC" resolves to "MERCURY" without touching anything else.
+  const ABBREV = {
+    MERC: 'MERCURY',
+    HOND: 'HONDA',
+    EVIN: 'EVINRUDE',
+    YAM: 'YAMAHA',
+  };
+
+  // Tokens that are pure boilerplate/units, never part of a manufacturer name.
+  const UNIT_TOKENS = new Set(['FT', 'HP', 'IN', 'METER', 'METERS', 'LB', 'LBS', 'STR']);
+
+  // Whole-value generic terms — never a manufacturer, always "not a make".
+  // Matched against the compact (letters/digits only) form of the value.
+  const GENERIC_TERMS = new Set([
+    'BOAT', 'BOATS', 'MOTORONLY', 'RENTAL', 'PONTOON', 'PONTOONS', 'SKIBOAT',
+    'ALUMINUM', 'AIRBOAT', 'TTOP', 'HOUSEBOAT', 'JETBOAT', 'CATAMARAN', 'BARGE',
+    'NEWBOAT', 'WORKBARGE', 'MONKEYBARGE', 'BOTHPONTOONS', 'FLATBARGE',
+    'JOHNBOAT', 'FIREBOAT', 'IDAHOBOAT', 'BOATWITHLOGO', 'TRITOON', 'SKIFF',
+    'MAINSHIP', 'MOTOR', 'ENGINE', 'TRAILER', 'UNIT', 'NA', 'NONE', 'UNKNOWN',
+    'TBD', 'MISC', 'OTHER', 'CUSTOM', 'HOMEMADE', 'HANDMADE',
+  ]);
+
+  function compact(s) {
+    return (s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  }
+
+  // Whole-value patterns that are clearly a unit id / placeholder, not a make:
+  // "#7", "BOAT #12", "BOAT # 15", "6756" (pure number), "BOAT WITH LOGO" etc.
+  const GENERIC_PATTERNS = [
+    /^\d+$/,                          // pure number
+    /^#\s*\d+$/,                      // #7
+    /^BOAT\s*#\s*\d+$/i,              // BOAT #12 / BOAT#12
+    /^BOAT\s+\d+$/i,                  // BOAT 1
+    /^UNIT\s*#?\s*\d+$/i,             // UNIT 5 / UNIT #5
+  ];
+
+  function isGenericWhole(upperTrimmed) {
+    if (GENERIC_PATTERNS.some(re => re.test(upperTrimmed))) return true;
+    if (GENERIC_TERMS.has(compact(upperTrimmed))) return true;
+    return false;
+  }
+
+  // ---- Build canonical lookup structures -------------------------------------
+  let CANON = []; // { name, industry, key }
+  function buildCanon() {
+    CANON = CANONICAL_MAKES.map(([name, industry]) => ({
+      name, industry, key: compact(name),
+      // per-word tokens (whitespace-delimited, each individually compacted) —
+      // used for subsequence matching so "SUN TRACKER" matches the contiguous
+      // ["SUN","TRACKER"] run inside a longer token list without matching on
+      // a coincidental mid-word character substring
+      tokens: name.split(/\s+/).map(compact).filter(Boolean),
+    }));
+  }
+
+  // ---- Normalize a raw OldMake value into tokens/compact key -----------------
+  function normalize(raw) {
+    const upper = (raw || '').trim().toUpperCase();
+    if (!upper) return { upper, tokens: [], compactKey: '', generic: true, reason: 'empty' };
+    if (isGenericWhole(upper)) return { upper, tokens: [], compactKey: compact(upper), generic: true, reason: 'generic-term' };
+
+    // tokenize on any non-alphanumeric run
+    const rawTokens = upper.split(/[^A-Z0-9']+/).filter(Boolean).map(t => t.replace(/'/g, ''));
+    const tokens = [];
+    for (let t of rawTokens) {
+      if (!t) continue;
+      if (/^\d+$/.test(t)) continue; // drop pure-numeric tokens (lengths, HP numbers, unit #s)
+      if (UNIT_TOKENS.has(t)) continue; // drop unit words
+      if (ABBREV[t]) t = ABBREV[t];
+      tokens.push(t);
+    }
+    const compactKey = tokens.join('');
+    if (!compactKey) return { upper, tokens: [], compactKey: '', generic: true, reason: 'numeric-or-units-only' };
+    return { upper, tokens, compactKey, generic: false };
+  }
+
+  // does `big` contain `small` as a contiguous, in-order run of tokens?
+  function containsTokenRun(big, small) {
+    if (!small.length || small.length > big.length) return false;
+    for (let i = 0; i <= big.length - small.length; i++) {
+      let ok = true;
+      for (let j = 0; j < small.length; j++) {
+        if (big[i + j] !== small[j]) { ok = false; break; }
+      }
+      if (ok) return true;
+    }
+    return false;
+  }
+
+  // ---- Levenshtein distance (iterative, single row) --------------------------
+  function levenshtein(a, b) {
+    if (a === b) return 0;
+    const al = a.length, bl = b.length;
+    if (al === 0) return bl;
+    if (bl === 0) return al;
+    let prev = new Array(bl + 1);
+    for (let j = 0; j <= bl; j++) prev[j] = j;
+    for (let i = 1; i <= al; i++) {
+      const cur = new Array(bl + 1);
+      cur[0] = i;
+      const ca = a.charCodeAt(i - 1);
+      for (let j = 1; j <= bl; j++) {
+        const cost = ca === b.charCodeAt(j - 1) ? 0 : 1;
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+      }
+      prev = cur;
+    }
+    return prev[bl];
+  }
+
+  function similarity(a, b) {
+    const maxLen = Math.max(a.length, b.length);
+    if (maxLen === 0) return 1;
+    return 1 - levenshtein(a, b) / maxLen;
+  }
+
+  // ---- Match one normalized value against the canonical set ------------------
+  // Returns { status: 'generic'|'exact'|'contains'|'fuzzy'|'review', match, industry, altIndustries, score, guess }
+  function matchOne(norm) {
+    if (norm.generic) return { status: 'generic' };
+    const key = norm.compactKey;
+
+    // exact
+    const exactHits = CANON.filter(c => c.key === key);
+    if (exactHits.length) {
+      const industries = Array.from(new Set(exactHits.map(c => c.industry)));
+      return { status: 'exact', match: exactHits[0].name, industry: industries.join(', '), score: 1 };
+    }
+
+    // token-run containment: the canonical name's own words appear as a
+    // contiguous, in-order run inside the value's word list (e.g. "SUN
+    // TRACKER" inside ["SUNTRACKER","T43"], "MERCURY" inside ["40HP",
+    // "MERCURY"]), checked in both directions so a customer's shorthand
+    // ("FREEMAN") still finds a longer canonical name ("FREEMAN BOATWORKS")
+    // — matching whole tokens (not raw character substrings) avoids
+    // coincidences like "LANA" matching inside "SOLANAEV"
+    const MIN_KEY_LEN = 3;
+    // the reverse direction (canonical is longer than the value, e.g. value
+    // "FREEMAN" found inside canonical "FREEMAN BOATWORKS") is only safe to
+    // try when every one of the value's own tokens has real substance —
+    // otherwise a throwaway single-letter token like "T" (from "T-45") will
+    // coincidentally match the middle word of some unrelated multi-word
+    // canonical name ("ROYAL T TRAILERS")
+    const reverseOk = norm.tokens.length > 0 && norm.tokens.every(t => t.length >= 3);
+    let best = null;
+    for (const c of CANON) {
+      if (c.key.length < MIN_KEY_LEN) continue;
+      if (containsTokenRun(norm.tokens, c.tokens) || (reverseOk && containsTokenRun(c.tokens, norm.tokens))) {
+        if (!best || c.key.length > best.key.length) best = c;
+      }
+    }
+    // compact-string prefix containment: catches a brand name fused with a
+    // trailing suffix the tokenizer couldn't cleanly separate (a boat length
+    // or HP figure stuck directly to a word, e.g. "MONTEREY180FS",
+    // "SEAVEE350HP"). Deliberately prefix-only (not "appears anywhere") and
+    // gated on a longer minimum length than the token check, since a short
+    // canonical name is too likely to prefix-match an unrelated word by
+    // coincidence (e.g. a 2-letter canonical key would "match" all sorts of
+    // things it has nothing to do with).
+    const MIN_PREFIX_LEN = 5;
+    if (key.length >= MIN_PREFIX_LEN) {
+      for (const c of CANON) {
+        if (c.key.length < MIN_PREFIX_LEN) continue;
+        if (key.startsWith(c.key) || c.key.startsWith(key)) {
+          if (!best || c.key.length > best.key.length) best = c;
+        }
+      }
+    }
+    if (best) {
+      const sameNameHits = CANON.filter(c => c.key === best.key);
+      const industries = Array.from(new Set(sameNameHits.map(c => c.industry)));
+      const status = best.tokens.length === norm.tokens.length ? 'exact' : 'contains';
+      return { status, match: best.name, industry: industries.join(', '), score: best.key.length / Math.max(key.length, best.key.length) };
+    }
+
+    // fuzzy (typo-tolerant), only against similarly-sized canonical keys
+    let bestScore = 0, bestC = null;
+    for (const c of CANON) {
+      if (Math.abs(c.key.length - key.length) > 3) continue;
+      const s = similarity(key, c.key);
+      if (s > bestScore) { bestScore = s; bestC = c; }
+    }
+    if (bestC && bestScore >= 0.82) {
+      return { status: 'fuzzy', match: bestC.name, industry: bestC.industry, score: bestScore };
+    }
+
+    // no confident match — still surface the closest guess as a hint only
+    if (bestC && bestScore >= 0.55) {
+      return { status: 'review', guess: bestC.name, guessIndustry: bestC.industry, score: bestScore };
+    }
+    return { status: 'review', score: bestScore || 0 };
+  }
+
+  // ---- CSV parsing (RFC4180-ish: quoted fields, embedded commas/quotes) ------
+  function parseCsv(text) {
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; }
+          else inQuotes = false;
+        } else field += c;
+      } else {
+        if (c === '"') inQuotes = true;
+        else if (c === ',') { row.push(field); field = ''; }
+        else if (c === '\r') { /* skip */ }
+        else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+        else field += c;
+      }
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows.filter(r => r.length > 1 || (r.length === 1 && r[0] !== ''));
+  }
+
+  function csvCell(v) {
+    const s = v == null ? '' : String(v);
+    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  function findCol(headers, ...names) {
+    const lower = headers.map(h => h.trim().toLowerCase());
+    for (const n of names) {
+      const idx = lower.indexOf(n.toLowerCase());
+      if (idx !== -1) return idx;
+    }
+    return -1;
+  }
+
+  // ---- Parse one uploaded file into row objects ------------------------------
+  function parseMakeMappingFile(text, fileName) {
+    const table = parseCsv(text);
+    if (!table.length) throw new Error('Empty file');
+    const headers = table[0];
+    const srcIdx = findCol(headers, 'Source');
+    const oldIdx = findCol(headers, 'OldMake', 'Old Make');
+    const newIdx = findCol(headers, 'NewMake', 'New Make');
+    if (oldIdx === -1) throw new Error('No "OldMake" column found');
+
+    const rows = [];
+    for (let i = 1; i < table.length; i++) {
+      const r = table[i];
+      const oldMake = (r[oldIdx] || '').trim();
+      if (!oldMake) continue;
+      const source = srcIdx !== -1 ? (r[srcIdx] || '').trim() : '';
+      const existingNew = newIdx !== -1 ? (r[newIdx] || '').trim() : '';
+      const norm = normalize(oldMake);
+      const m = matchOne(norm);
+      let suggested = '';
+      if (m.status === 'exact' || m.status === 'contains' || m.status === 'fuzzy') suggested = m.match;
+      else if (m.status === 'generic' || m.status === 'review') suggested = 'OTHER';
+      rows.push({
+        source,
+        oldMake,
+        newMake: (suggested || existingNew || '').toUpperCase(),
+        industry: m.industry || '',
+        status: m.status,
+        score: m.score || 0,
+        guess: m.guess || '',
+        guessIndustry: m.guessIndustry || '',
+        sourceFile: fileName,
+      });
+    }
+    return rows;
+  }
+
+  // ============================================================================
+  // UI wiring
+  // ============================================================================
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+  const fileChipWrap = document.getElementById('file-chip-wrap');
+  const statusLine = document.getElementById('status-line');
+  const resultsCard = document.getElementById('results-card');
+  const statsRow = document.getElementById('stats-row');
+  const tblBody = document.getElementById('tbl-body');
+  const downloadBtn = document.getElementById('download-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const filterSelect = document.getElementById('filter-select');
+  const searchBox = document.getElementById('search-box');
+
+  buildCanon();
+
+  let fileEntries = []; // { id, name, size, status, rows, error }
+  let entrySeq = 0;
+  let currentFilter = 'all';
+  let currentSearch = '';
+
+  ['dragenter', 'dragover'].forEach(evt =>
+    dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('over'); })
+  );
+  ['dragleave', 'drop'].forEach(evt =>
+    dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('over'); })
+  );
+  dropZone.addEventListener('drop', e => {
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length) handleFiles(files);
+  });
+  fileInput.addEventListener('change', e => {
+    const files = Array.from(e.target.files || []);
+    if (files.length) handleFiles(files);
+    fileInput.value = '';
+  });
+  clearBtn.addEventListener('click', () => {
+    fileEntries = [];
+    renderFileChips();
+    resultsCard.style.display = 'none';
+    setStatus('');
+  });
+  filterSelect.addEventListener('change', () => { currentFilter = filterSelect.value; refreshResults(); });
+  searchBox.addEventListener('input', () => { currentSearch = searchBox.value.trim().toUpperCase(); refreshResults(); });
+
+  function setStatus(msg, isErr) {
+    statusLine.textContent = msg || '';
+    statusLine.classList.toggle('err', !!isErr);
+  }
+
+  function renderFileChips() {
+    fileChipWrap.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    for (const entry of fileEntries) {
+      const div = document.createElement('div');
+      const cls = entry.status === 'error' ? 'error' : (entry.status === 'done' ? '' : 'pending');
+      div.className = 'file-chip' + (cls ? ' ' + cls : '');
+      let icon = '📄';
+      let sub = `${(entry.size / 1024).toFixed(0)} KB`;
+      if (entry.status === 'done') { icon = '✅'; sub += ` — ${entry.rows.length} rows`; }
+      else if (entry.status === 'error') { icon = '⚠️'; sub += ` — ${entry.error}`; }
+      div.innerHTML = `
+        <div class="fc-icon">${icon}</div>
+        <div class="fc-info">
+          <div class="fc-name">${escapeHtml(entry.name)}</div>
+          <div class="fc-sub">${escapeHtml(sub)}</div>
+        </div>
+        <button class="fc-remove" data-id="${entry.id}" title="Remove">✕</button>`;
+      frag.appendChild(div);
+    }
+    fileChipWrap.appendChild(frag);
+    fileChipWrap.querySelectorAll('.fc-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = Number(btn.dataset.id);
+        fileEntries = fileEntries.filter(e => e.id !== id);
+        renderFileChips();
+        refreshResults();
+      });
+    });
+  }
+
+  function handleFiles(files) {
+    const csvFiles = files.filter(f => /\.csv$/i.test(f.name));
+    if (!csvFiles.length) {
+      setStatus('Please choose CSV file(s).', true);
+      return;
+    }
+    const newEntries = csvFiles.map(f => ({ id: entrySeq++, name: f.name, size: f.size, file: f, status: 'pending', rows: null, error: null }));
+    fileEntries.push(...newEntries);
+    renderFileChips();
+
+    let pending = newEntries.length;
+    newEntries.forEach(entry => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          entry.rows = parseMakeMappingFile(reader.result, entry.name);
+          entry.status = 'done';
+        } catch (err) {
+          entry.status = 'error';
+          entry.error = err && err.message ? err.message : String(err);
+        }
+        renderFileChips();
+        pending--;
+        if (pending === 0) {
+          const ok = fileEntries.filter(e => e.status === 'done').length;
+          const err = fileEntries.filter(e => e.status === 'error').length;
+          setStatus(`Done — ${ok} file${ok === 1 ? '' : 's'} parsed${err ? `, ${err} failed` : ''}.`, err > 0 && ok === 0);
+          refreshResults();
+        }
+      };
+      reader.onerror = () => {
+        entry.status = 'error';
+        entry.error = 'Could not read file';
+        renderFileChips();
+        pending--;
+      };
+      reader.readAsText(entry.file);
+    });
+  }
+
+  function allRows() {
+    const rows = [];
+    for (const entry of fileEntries) {
+      if (entry.status !== 'done') continue;
+      rows.push(...entry.rows);
+    }
+    return rows;
+  }
+
+  const STATUS_LABEL = {
+    exact: 'Exact match', contains: 'Strong match', fuzzy: 'Fuzzy match',
+    generic: 'Not a make', review: 'Needs review',
+  };
+  const STATUS_CLASS = {
+    exact: 'st-exact', contains: 'st-exact', fuzzy: 'st-fuzzy',
+    generic: 'st-generic', review: 'st-review',
+  };
+  // "Not a make" rows get auto-filled with OTHER, but — like unmatched rows
+  // — they're a guess about the data, not a confirmed brand, so both are
+  // flagged for a human pass rather than treated as fully resolved.
+  const NEEDS_REVIEW_STATUSES = new Set(['review', 'generic']);
+
+  function refreshResults() {
+    const rows = allRows();
+    if (!rows.length) { resultsCard.style.display = 'none'; return; }
+    resultsCard.style.display = 'block';
+
+    const counts = { exact: 0, contains: 0, fuzzy: 0, generic: 0, review: 0 };
+    for (const r of rows) counts[r.status] = (counts[r.status] || 0) + 1;
+    const matched = counts.exact + counts.contains + counts.fuzzy;
+    const needsReview = counts.review + counts.generic;
+    statsRow.innerHTML = `
+      <div class="stat-box"><div class="stat-num">${rows.length}</div><div class="stat-lbl">Total Rows</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--success)">${matched}</div><div class="stat-lbl">Matched</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--gold)">${needsReview}</div><div class="stat-lbl">🚩 Flagged For Review</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--muted)">${counts.generic}</div><div class="stat-lbl">— incl. Not A Make</div></div>
+    `;
+
+    let visible = rows;
+    if (currentFilter === 'flagged') visible = visible.filter(r => NEEDS_REVIEW_STATUSES.has(r.status));
+    else if (currentFilter !== 'all') visible = visible.filter(r => r.status === currentFilter);
+    if (currentSearch) visible = visible.filter(r => r.oldMake.toUpperCase().includes(currentSearch) || r.newMake.toUpperCase().includes(currentSearch));
+
+    tblBody.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    visible.forEach((r, i) => {
+      const tr = document.createElement('tr');
+      if (NEEDS_REVIEW_STATUSES.has(r.status)) tr.classList.add('row-flagged');
+      const guessHint = r.status === 'review' && r.guess ? `<div class="guess-hint">closest: ${escapeHtml(r.guess)} (${Math.round(r.score * 100)}%)</div>` : '';
+      const flag = NEEDS_REVIEW_STATUSES.has(r.status) ? '<span class="review-flag" title="Flagged for review">🚩</span>' : '';
+      tr.innerHTML = `
+        <td style="font-size:.72rem;color:var(--muted);white-space:nowrap;">${escapeHtml(r.source || '—')}</td>
+        <td style="font-size:.8rem;">${flag}${escapeHtml(r.oldMake)}</td>
+        <td>
+          <input class="new-make-input" type="text" value="${escapeHtml(r.newMake)}" data-idx="${rows.indexOf(r)}" />
+          ${guessHint}
+        </td>
+        <td style="font-size:.72rem;color:var(--muted);white-space:nowrap;">${escapeHtml(r.industry || '—')}</td>
+        <td><span class="status-badge ${STATUS_CLASS[r.status]}">${STATUS_LABEL[r.status]}</span></td>`;
+      frag.appendChild(tr);
+    });
+    tblBody.appendChild(frag);
+
+    tblBody.querySelectorAll('.new-make-input').forEach(input => {
+      input.addEventListener('input', () => {
+        const idx = Number(input.dataset.idx);
+        rows[idx].newMake = input.value.toUpperCase();
+      });
+      input.addEventListener('blur', () => { input.value = input.value.toUpperCase(); });
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  downloadBtn.addEventListener('click', () => {
+    const rows = allRows();
+    if (!rows.length) {
+      alert('No data to export yet — drop in at least one CSV first.');
+      return;
+    }
+    const lines = ['Source,OldMake,NewMake'];
+    for (const r of rows) {
+      lines.push([csvCell(r.source), csvCell(r.oldMake), csvCell((r.newMake || '').toUpperCase())].join(','));
+    }
+    const csvText = lines.join('\r\n');
+    const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const doneEntries = fileEntries.filter(e => e.status === 'done');
+    const base = doneEntries.length === 1 ? doneEntries[0].name.replace(/\.csv$/i, '') : `MakeMapping_${doneEntries.length}_Files`;
+    a.href = url; a.download = `${base}_Completed.csv`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+})();
+</script>
